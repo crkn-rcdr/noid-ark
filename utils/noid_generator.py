@@ -3,7 +3,8 @@ from repository.counter import CounterRepository
 from utils.error_handlers import InvalidTemplateError 
 from sqlalchemy.exc import SQLAlchemyError
 from typing import Optional
-
+from db_config.sqlalchemy_async_connect import async_get_db
+from sqlalchemy.ext.asyncio import AsyncSession
 # Define character sets
 DIGIT = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 XDIGIT = DIGIT + ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'm', 'n',
@@ -12,9 +13,6 @@ XDIGIT = DIGIT + ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'm', 'n',
 # Define template types
 GENTYPES = ['r', 's', 'z']
 DIGTYPES = ['d', 'e']
-
-#Initialize a counter instance
-counter = CounterRepository()
 
 class NoidGenerator:
     def __init__(self) -> None:
@@ -45,7 +43,7 @@ class NoidGenerator:
 
         return new_prefix      
     
-    async def mint(self,template:str = 'reedeedeedk',schema = None,naan:str = None) -> str:
+    async def mint(self,template:str = 'reedeedeedk',schema = None,naan:str = None,session: AsyncSession = None, counter_instance: CounterRepository = None) -> str:
         """
         Mint a NOID based on the provided template, scheme, and NAAN.
 
@@ -70,8 +68,8 @@ class NoidGenerator:
         while True:
             try:
                 # Retrieve and increment the counter atomically
-                n = await counter.get_counter()
-                await counter.update_counter
+                n = await counter_instance.get_counter(session)
+                await counter_instance.update_counter(session)
             except SQLAlchemyError as e:
                 raise e
             
@@ -132,6 +130,30 @@ class NoidGenerator:
             return None
         return xdig[::-1]
     
+    def __validateMask(self, mask: str) -> bool:
+        """
+        Validate the mask string to ensure it follows the expected format.
+
+        Args:
+            mask (str): Mask string.
+
+        Returns:
+            bool: True if valid, else raises InvalidTemplateError.
+        """
+        masks = ['e', 'd']
+        checkchar = ['k']
+
+        if not (mask[0] in GENTYPES or mask[0] in masks):
+            raise InvalidTemplateError("Template is invalid.")
+        elif not (mask[-1] in checkchar or mask[-1] in masks):
+            raise InvalidTemplateError("Template is invalid.")
+        else:
+            for maskchar in mask[1:-1]:
+                if not (maskchar in masks):
+                    raise InvalidTemplateError("Template is invalid.")
+
+        return True
+
     def __checkdigit(self,s:str) -> str:
         """
         Calculate and return the check digit for the NOID.

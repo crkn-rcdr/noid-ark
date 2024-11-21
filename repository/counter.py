@@ -1,4 +1,4 @@
-from models.models import Counter
+from models.data.models import Counter
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 import logging
@@ -8,10 +8,10 @@ logging.basicConfig(level=logging.INFO,handlers=[logging.StreamHandler()])
 logger = logging.getLogger(__name__)
 
 class CounterRepository:
-    def __init__(self,sess:AsyncSession) -> None:
-        self.sess:AsyncSession = sess
+    def __init__(self) -> None:
+        pass
 
-    async def update_counter(self,n:int) -> bool:
+    async def update_counter(self,session:AsyncSession) -> bool:
         """
         Update the `current` field of the unique Counter object and commit the transaction.
         If the Counter object does not exist, create a new record.
@@ -19,25 +19,26 @@ class CounterRepository:
         Returns:
             bool: Returns True if the update or creation is successful, otherwise raises an exception.
         """
+
         try:
             sql = select(Counter)
-            result = await self.sess.execute(sql)
+            result = await session.execute(sql)
             counter = result.scalars().first()
 
             if counter:
                 counter.current += 1
             else:
                 counter = Counter(current=1)
-                self.sess.add(counter)
+                session.add(counter)
             
-            await self.sess.commit()
+            await session.commit()
         except Exception as e:
-            await self.sess.rollback()
+            await session.rollback()
             logger.info(f"Failed to update counter: {e}", exc_info=True)
             raise RuntimeError(f"Failed to update counter,please check logger for detail")
         return True
         
-    async def get_counter(self) -> int:
+    async def get_counter(self,session:AsyncSession) -> int:
         """
         Retrieve the `current` value of the Counter object.
 
@@ -47,11 +48,9 @@ class CounterRepository:
         try:
             sql = select(Counter)
             sql.execution_options(synchronize_session="fetch")
-            result = await self.sess.execute(sql)
-            current = result.scalar_one_or_none()
-            if current is None:
-                return 0
-            return current
+            result = await session.execute(sql)
+            counter = result.scalar_one_or_none()
+            return counter.current if counter.current else 0
         except Exception as e:
             logger.info(f"Failed to get a counter: {e}", exc_info=True)
             raise RuntimeError(f"Failed to get a counter,please check logger for detail")

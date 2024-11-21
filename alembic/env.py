@@ -2,7 +2,7 @@ from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
-
+from models.data.models import Base
 from alembic import context
 
 import os
@@ -15,7 +15,7 @@ config = context.config
 
 #load env
 load_dotenv()
-DATABASE_URL = os.getenv("DB_URL")
+DATABASE_URL = os.getenv("DB_URL_SYNC")
 if not DATABASE_URL:
     raise RuntimeError("DATABASE_URL is not set up")
 
@@ -31,7 +31,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = None
+target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
