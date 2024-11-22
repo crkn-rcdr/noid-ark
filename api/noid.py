@@ -9,6 +9,7 @@ from utils.noid_generator import NoidGenerator
 from utils.error_handlers import InvalidTemplateError
 import logging
 from repository.counter import CounterRepository
+from repository.noid_repo import NoidRepository
 
 router = APIRouter(
     tags=["Noid"]
@@ -28,7 +29,8 @@ logger = logging.getLogger(__name__)
 async def generate_noids(
     request:NoidRequest,
     session: AsyncSession = Depends(async_get_db),
-    counter_instance: CounterRepository = Depends()):
+    counter_instance: CounterRepository = Depends(),
+    noid_instance: NoidRepository = Depends()):
     """
     Generate a specified number of NOIDs based on the provided type, scheme, and NAAN.
 
@@ -61,12 +63,13 @@ async def generate_noids(
             for _ in range(m):
                 noid = await noid_generator.mint(template = template,schema = schema_,naan = naan,session = session,counter_instance = counter_instance)
                 noids.append(noid)
+                await noid_instance.insert_noid(session,noid,schema_,naan)
     except InvalidTemplateError  as e:
         logger.error(f"Invalid template: {e}")
         raise HTTPException(status_code=400,detail="Invalid Template")
     except Exception as e:
         logger.error(f"Error: {e}")
-        raise HTTPException(status_code=500, detail="Internal server error,check the log for detail")
+        raise HTTPException(status_code=500, detail="Internal server error,please check the log for detail")
     
     return NoidResponse(noids=noids)
 
