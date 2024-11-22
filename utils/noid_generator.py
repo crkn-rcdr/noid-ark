@@ -1,4 +1,4 @@
-from random import randint
+from models.request.noid_request import SchemaType
 from repository.counter import CounterRepository
 from utils.error_handlers import InvalidTemplateError 
 from sqlalchemy.exc import SQLAlchemyError
@@ -43,7 +43,7 @@ class NoidGenerator:
 
         return new_prefix      
     
-    async def mint(self,template:str = 'reedeedeedk',schema = None,naan:str = None,session: AsyncSession = None, counter_instance: CounterRepository = None) -> str:
+    async def mint(self,schema:SchemaType,naan:str,session: AsyncSession, counter_instance: CounterRepository,template:str = 'reedeedeedk',) -> str:
         """
         Mint a NOID based on the provided template, scheme, and NAAN.
 
@@ -84,7 +84,7 @@ class NoidGenerator:
         noid = prefix + noid_body
 
         if naan:
-            noid = naan.strip("/") + noid
+            noid = naan + "/" + noid
         if mask[-1] == "k":
             noid += self.__checkdigit(noid)
 

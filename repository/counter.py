@@ -50,7 +50,7 @@ class CounterRepository:
             sql.execution_options(synchronize_session="fetch")
             result = await session.execute(sql)
             counter = result.scalar_one_or_none()
-            return counter.current if counter.current else 0
+            return counter.current if counter else 0
         except Exception as e:
             logger.info(f"Failed to get a counter: {e}", exc_info=True)
             raise RuntimeError(f"Failed to get a counter,please check logger for detail")

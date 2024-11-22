@@ -14,5 +14,5 @@ class Noid(Base):
 
     noid = Column(String,primary_key=True)
     schema_ = Column(String,nullable=False,comment="Scheme prefix for the NOID, e.g., 'ark:/'")
-    naan = Column(String,nullable=False,default="ark",comment="NAAN (Name Assigning Authority Number) for the NOID")
+    naan = Column(String,nullable=False,comment="NAAN (Name Assigning Authority Number) for the NOID")
     create_time = Column(DateTime,server_default=func.now(),comment="Time when the NOID was created")

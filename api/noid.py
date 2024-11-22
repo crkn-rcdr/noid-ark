@@ -1,6 +1,6 @@
 from fastapi import APIRouter,Depends,HTTPException
 from utils.settings import CRKN_PREFIX_TEMPLATE_MAPPING
-from models.request.noid_reqeust import NoidRequest
+from models.request.noid_request import NoidRequest
 from models.response.noid_response import NoidResponse
 import asyncio
 from sqlalchemy.ext.asyncio import AsyncSession
