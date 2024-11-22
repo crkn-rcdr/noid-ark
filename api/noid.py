@@ -25,7 +25,10 @@ logging.basicConfig(level=logging.INFO,handlers=[logging.StreamHandler()])
 logger = logging.getLogger(__name__)
 
 @router.post("/generate_noids",response_model = NoidResponse)
-async def generate_noids(request:NoidRequest,session: AsyncSession = Depends(async_get_db)):
+async def generate_noids(
+    request:NoidRequest,
+    session: AsyncSession = Depends(async_get_db),
+    counter_instance: CounterRepository = Depends()):
     """
     Generate a specified number of NOIDs based on the provided type, scheme, and NAAN.
 
@@ -50,7 +53,7 @@ async def generate_noids(request:NoidRequest,session: AsyncSession = Depends(asy
     prefix,mask = mapping
     # Construct the template, e.g., 'm.reedeedeedk'
     template = f"{prefix}.{mask}"
-    counter_instance = CounterRepository()
+   
 
     noids = []
     try:
