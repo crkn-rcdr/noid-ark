@@ -12,7 +12,8 @@ from repository.counter import CounterRepository
 from repository.noid_repo import NoidRepository
 
 router = APIRouter(
-    tags=["Noid"]
+    tags=["Noid"],
+    prefix="/noid"
 )
 
 #Initialize an asyncio lock

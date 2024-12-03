@@ -1,11 +1,14 @@
 from fastapi import FastAPI
-from api.noid import router
+from api.noid import router as noid_router
+from api.ark_resolver import router as ark_router
 from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
+from lifespan.lifespan import lifespan
 app = FastAPI(
     title="NOID Generator API",
     description="API to generate NOIDs (Nice Opaque Identifiers) based on specified types and a default template.",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan
 )
 origins = [
    '*'
@@ -20,4 +23,5 @@ app.add_middleware(
 async def redirect_to_docs():
     return RedirectResponse(url="/docs")
 
-app.include_router(router)
+app.include_router(noid_router)
+app.include_router(ark_router)

@@ -13,20 +13,21 @@ class CaseInsensitiveEnum(str,Enum):
         return super()._missing_(value)
     
 class CRKNType(CaseInsensitiveEnum):
-    generic = "generic"
+    manifest = "manifest"
+    manifests = "manifests"
     canvas = "canvas"
     canvases = "canvases"
     collection = "collection"
     collections = "collections"
-    manifest = "manifest"
-    manifests = "manifests"
+    generic = "generic"
 
 class SchemaType(CaseInsensitiveEnum):
+    ARK = "ARK"
     PURL = "PURL"
     Handle = "Handle"
     URN = "URN"
     DOI = "DOI"
-    ARK = "ARK"
+   
 
 class NoidRequest(BaseModel):
     m:int = Field(...,gt=0,description="models/data/models.py")

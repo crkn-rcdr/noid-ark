@@ -34,7 +34,7 @@ class NoidRepository:
             return True
         except Exception as e:
             await session.rollback()
-            logger.info(f"Failed to insert a noid: {e}", exc_info=True)
+            logger.error(f"Failed to insert a noid: {e}", exc_info=True)
             raise RuntimeError(f"Failed to insert a noid,please check logger for detail")
      
         

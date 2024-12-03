@@ -3,8 +3,8 @@ from repository.counter import CounterRepository
 from utils.error_handlers import InvalidTemplateError 
 from sqlalchemy.exc import SQLAlchemyError
 from typing import Optional
-from db_config.sqlalchemy_async_connect import async_get_db
 from sqlalchemy.ext.asyncio import AsyncSession
+from datetime import datetime
 # Define character sets
 DIGIT = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 XDIGIT = DIGIT + ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'm', 'n',
@@ -13,6 +13,9 @@ XDIGIT = DIGIT + ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'm', 'n',
 # Define template types
 GENTYPES = ['r', 's', 'z']
 DIGTYPES = ['d', 'e']
+
+# Get current year
+current_year = str(datetime.now().year)
 
 class NoidGenerator:
     def __init__(self) -> None:
@@ -81,7 +84,7 @@ class NoidGenerator:
                 # Namespace exhausted, create a new namespace and continue
                 prefix = self._create_new_namespace(prefix)
         
-        noid = prefix + noid_body
+        noid = prefix +  current_year + noid_body
 
         if naan:
             noid = naan + "/" + noid
