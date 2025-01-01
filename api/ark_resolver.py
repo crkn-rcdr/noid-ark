@@ -1,5 +1,4 @@
-from fastapi import APIRouter,HTTPException,status
-from fastapi import Request
+from fastapi import APIRouter,HTTPException,status,Request
 import logging
 from fastapi.responses import RedirectResponse
 
@@ -13,12 +12,12 @@ logging.basicConfig(level=logging.INFO,handlers=[logging.StreamHandler()])
 logger = logging.getLogger(__name__)
 
 @router.get("/{ark:path}")
-async def redirect_url(ark:str,request:Request):
+async def get_url(ark:str,request:Request):
     solr = getattr(request.app.state,"solr",None)
     if not solr:
         logger.error("Solr is not available")
-        raise HTTPException(status_code=500,detail="Solr not available")
-    
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail="Solr not available")
+
     # Get a corresponding ark
     query = f"ark:{ark}"
     try:
@@ -55,10 +54,10 @@ async def redirect_url(ark:str,request:Request):
                                 case "McGillAC":
                                     url = "https://mcgillarchives.canadiana.ca/view/"
 
-        return RedirectResponse(url=f"{url}{slug}" )                
+        return {"url" :f"{url}{slug}" }             
         
     except Exception as e:
         logger.error(f"Error querying Solr: {e}",exc_info=True)
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail="Server error, please check log")
-
+        raise
+        
         
